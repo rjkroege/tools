@@ -1,0 +1,127 @@
+# Source this file to setup for chrome dev.
+
+GYP_GENERATORS = make
+_o = $home/g
+_s = $home/g/src
+_d = $_o/depot_tools
+_w = $_s/third_party/WebKit
+
+path = ($_s/tools $_d $path )
+
+# Running the Chromium
+fn runXcodeChrome {
+	_o = $home/g ;  \
+	$_o/src/xcodebuild/Debug/Chromium.app/Contents/MacOS/Chromium \
+		--user-data-dir'='$home/DebugChromeProfile \
+		$*
+}
+
+fn runXcodeReleaseChrome {
+	_o = $home/g ;  \
+	$_o/src/xcodebuild/Release/Chromium.app/Contents/MacOS/Chromium \
+		$*
+}
+
+# TODO(rjkroege): work on this further
+fn debug {
+	win gdb ./src/xcodebuild/Debug/TestShell.app/Contents/MacOS/TestShell
+}
+
+# possibly obsolete.
+# run like this
+fn layoutTest {
+  PYTHONPATH=$_s/webkit/tools/layout_tests/:$_s/tools/python/ ; 
+  $_s/webkit/tools/layout_tests/webkitpy/layout_tests/run_chromium_webkit_tests.py \
+      --debug \
+      --full-results-html \
+      $*
+}
+
+# must update this to point at something reasonable
+# from: git clone git://gitorious.org/qtwebkit/testfonts.git
+WEBKIT_TESTFONTS=$_o/testfonts
+
+fn gclient {
+  path = ($HOME/g/depot_tools /usr/bin /bin) $_o/depot_tools/gclient $*
+}
+
+# The -j may be harmful.
+fn nind {
+  @{cd $_s ; 
+      path = ( /Users/rjkroege/g/goma /Users/rjkroege/g/src/tools \
+          /Users/rjkroege/g/depot_tools /usr/local/bin /usr/bin /bin /usr/sbin /sbin)
+   ninja -C out/Debug DumpRenderTree}
+}
+
+# FIXME insert a tool to fetch test results.
+# really.
+fn ninw {
+  @{cd $_s ; 
+      path = ( /Users/rjkroege/g/goma /Users/rjkroege/g/src/tools \
+          /Users/rjkroege/g/depot_tools /usr/local/bin /usr/bin /bin /usr/sbin /sbin)
+   ninja -C out/Debug webkit_unit_tests}
+}
+
+fn ninc {
+  @{cd $_s ; 
+      path = ( /Users/rjkroege/g/goma /Users/rjkroege/g/src/tools \
+          /Users/rjkroege/g/depot_tools /usr/local/bin /usr/bin /bin /usr/sbin /sbin)
+   ninja -C out/Debug chrome}
+}
+
+# update these for the paths that I want to shorten
+depotlist = ( \
+	$_w \
+	$_s \
+)
+
+# truncates the given path argument to something nicer
+# arrange from longest to shortest
+fn skpupath {
+  ifs=() _pwd = `{pwd}
+  
+  for ( i in $depotlist ) {
+    # echo debugging $i
+    if( ~ $_pwd  $i^* ) {
+         echo $i | sed 's:'^$_o^'::'
+         return 0
+    }
+  }
+  return 1
+}
+
+# Does this need refinement?
+# Possibly.
+fn skpu {
+  b = `{git branch | awk '/^\*/ {print $2 }'}
+  _spork_path = '/usr/local/google/rjkroege'^`{skpupath}
+  echo  path $_spork_path
+  git commit -a -m wip
+  git push linux
+  ssh spork 'cd '^$_spork_path^'; git reset --hard'
+}
+
+# Running Goma
+# I might want to make this configurable
+fn goma-enable {
+  # TODO(rjkroege) insert calls here to initialize.
+  path = ($_s/third_party/llvm-build/Release+Asserts/bin $path)
+  CC = clang
+  CXX = clang++
+}
+
+fn goma-disable {
+  # TODO: This should also adjust the firewall configuration
+  _np = ()
+  for (i in $path) {
+    switch ($i) {
+    case $_s/third_party/llvm-build/Release+Asserts/bin
+    case *
+      _np = ($_np $i)
+    }
+  }
+  path = $_np
+  CC = ()
+  CXX = ()
+}
+

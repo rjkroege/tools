@@ -1,0 +1,22 @@
+# assorted setup for doing chromos work
+. $home/g/tools/start.rc
+
+_cs = /home/rjkroege/cros/chromeos/src/scripts
+_cr = /home/rjkroege/cros/chromeos
+
+CHROME_ORIGIN=LOCAL_SOURCE
+
+
+# -- Assroted hints, etc.
+
+cdpath = ( $_cr/src  $_cr/src/third_party/autotest/files/client  $cdpath   )
+
+ssh-agent | sed 's/;.*$//' > /tmp/chromos.$pid
+. /tmp/chromos.$pid
+ssh-add $home/.ssh/chromium
+ssh-add $home/.ssh/testing_rsa
+
+# Entering the chroot with chrome configured...
+# ./enter_chroot.sh --chrome_root'='$_o
+# actually build Chrome in the sandbox...
+# FEATURES="-usersandbox" CHROME_ORIGIN=LOCAL_SOURCE emerge-x86-generic chromeos-chrome
