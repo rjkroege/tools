@@ -56,6 +56,8 @@ cdpath = (
     $cdpath \
 )
 
+_extra_status = '(chrome) '
+
 # truncates the given path argument to something nicer
 # arrange from longest to shortest
 fn skpupath {
