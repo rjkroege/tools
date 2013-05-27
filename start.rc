@@ -10,7 +10,7 @@ switch ( `{uname} ) {
 case Darwin
   GYP_DEFINES = 'component=shared_library fast_build=1'
 case *
-  GYP_DEFIINES = 'component=shared_library fast_build=1 chromeos=1'
+  GYP_DEFINES = 'component=shared_library fast_build=1 chromeos=1'
 }
 
 path = ($_w/Tools/Scripts $_s/tools $_d $path )
@@ -48,7 +48,8 @@ matchlist = ( \
     $matchlist \
 )
 
-cdpath = (
+cdpath = (\
+    . \
     $_w/Source \
     $_w/LayoutTest \
     $_w/Platform \
