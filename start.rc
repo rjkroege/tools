@@ -5,6 +5,7 @@ _d = $_o/depot_tools
 _w = $_s/third_party/WebKit
 
 GYP_GENERATORS = ninja
+gomadir = /home/build/static/projects/goma
 
 switch ( `{uname} ) {
 case Darwin
@@ -76,6 +77,7 @@ fn skpupath {
 
 # Does this need refinement?
 # Possibly.
+# This is also obsolete.
 fn skpu {
   b = `{git branch | awk '/^\*/ {print $2 }'}
   _spork_path = '/usr/local/google/rjkroege'^`{skpupath}
@@ -109,3 +111,16 @@ fn goma-disable {
   CXX = ()
 }
 
+fn nin {
+  _eeh = `{pwd | sed 's/\//\\\//g'}^'\/out\/Debug\/Errors'
+  # echo $_eeh
+  # 9p read acme/index | awk  '{print $1}'
+  # echo '/'^$_eeh^'/ { print $1}'
+  _nef = `{9p read acme/index | awk '/'^$_eeh^'/ { print $1}'}
+  if (~ $#_nef 0)  {
+    echo "No error file? Bad directory?"
+  }
+  if not {
+    ninja -C out/Debug $* | 9p write acme/^$_nef^/body
+  }
+}
