@@ -1,16 +1,16 @@
 # assorted setup for doing chromos work
 . $home/g/tools/start.rc
 
-chrome_root = $_o/ob1_bw
+chrome_root = $_o
 cros_root = $_o/ob1_os_bw
 _os = $chrome_root/src
 
 
 # -- Assroted hints, etc.
 
-ssh-agent | sed 's/;.*$//' > /tmp/chromos.$pid
-. /tmp/chromos.$pid
-ssh-add $home/.ssh/chromium
+# ssh-agent | sed 's/;.*$//' > /tmp/chromos.$pid
+# . /tmp/chromos.$pid
+# ssh-add $home/.ssh/chromium
 
 # Entering the chroot with chrome configured...
 # ./enter_chroot.sh --chrome_root'='$_o

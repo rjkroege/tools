@@ -1,0 +1,12 @@
+# assorted setup for doing chromos work
+. $home/g/tools/start.rc
+
+_cs = $_o/cast/chromium/src
+
+fn d {
+    git diff chrome-base $*
+}
+
+fn dl {
+    git diff --name-only chrome-base 
+}

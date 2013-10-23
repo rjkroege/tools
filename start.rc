@@ -9,9 +9,9 @@ gomadir = /home/build/static/projects/goma
 
 switch ( `{uname} ) {
 case Darwin
-  GYP_DEFINES = 'component=shared_library fast_build=1'
+  GYP_DEFINES = 'component=shared_library fastbuild=1'
 case *
-  GYP_DEFINES = 'component=shared_library fast_build=1 chromeos=1'
+  GYP_DEFINES = 'component=shared_library fastbuild=1 chromeos=1'
 }
 
 path = ($_w/Tools/Scripts $_s/tools $_d $path )
@@ -20,22 +20,11 @@ path = ($_w/Tools/Scripts $_s/tools $_d $path )
 # from: git clone git://gitorious.org/qtwebkit/testfonts.git
 WEBKIT_TESTFONTS=$_o/testfonts
 
+# To get content_browsertests to run (And setup the dependencies.)
+CHROME_DEVEL_SANDBOX=/usr/local/sbin/chrome-devel-sandbox
+
 fn gclient {
   u $_o/depot_tools/gclient $*
-}
-
-# This might require adjusment
-# The -j may be harmful.
-fn nind {
-  @{cd $_s ; u ninja -C out/Debug DumpRenderTree}
-}
-
-fn ninw {
-  @{cd $_s ;  u ninja -C out/Debug webkit_unit_tests}
-}
-
-fn ninc {
-  @{cd $_s ; u  ninja -C out/Debug chrome}
 }
 
 # update these for the paths that I want to shorten
@@ -88,6 +77,7 @@ fn skpu {
 }
 
 # Running Goma
+# TODO(rjkroege): These need to be updated.
 # I might want to make this configurable
 fn goma-enable {
   # TODO(rjkroege) insert calls here to initialize.
@@ -111,16 +101,30 @@ fn goma-disable {
   CXX = ()
 }
 
+# I need this to work better...
 fn nin {
   _eeh = `{pwd | sed 's/\//\\\//g'}^'\/out\/Debug\/Errors'
   # echo $_eeh
   # 9p read acme/index | awk  '{print $1}'
   # echo '/'^$_eeh^'/ { print $1}'
   _nef = `{9p read acme/index | awk '/'^$_eeh^'/ { print $1}'}
-  if (~ $#_nef 0)  {
+  switch ( $#_nef )  {
+  case 0
     echo "No error file? Bad directory?"
-  }
-  if not {
+  case *
     ninja -C out/Debug $* | 9p write acme/^$_nef^/body
   }
 }
+
+# in particular, I want some scriptage to  do something useful...
+
+
+fn install {
+    ssh pixel stop ui
+    # Copy chrome over.
+    rsync -rtlv --inplace 'out/Release/'^(chrome content_shell chrome.pak libffmpegsumo.so locales resources resources.pak) pixel:/opt/google/chrome/.
+    rsync -rtlv --inplace out/Release/lib/ pixel:/opt/google/chrome/.
+    # ssh pixel start ui
+}
+
+# {rsync -rtlv --inplace 'out/Release/'^(chrome content_shell chrome.pak libffmpegsumo.so locales resources resources.pak) pixel:/opt/google/chrome/.}
