@@ -116,7 +116,7 @@ fn nin {
   case 0
     echo "No error file? Bad directory?"
   case *
-    ninja -j400 -C out/Debug $* | 9p write acme/^$_nef^/body
+    ninja -j400 -C $_target $* | 9p write acme/^$_nef^/body
   }
 }
 
