@@ -101,23 +101,34 @@ fn goma-disable {
   CXX = ()
 }
 
-# I need this to work better...
+# Path to out directory then targets. 
+# TODO(rjkroege): Make sure goma is running.
 fn nin {
-  _eeh = `{pwd | sed 's/\//\\\//g'}^'\/out\/Debug\/Errors'
+  _target = $1
+  shift   
+  _p = `{pwd}^'/'^$_target
+  _eeh = `{echo $_p | sed 's/\//\\\//g'}^'\/Errors'
   # echo $_eeh
   # 9p read acme/index | awk  '{print $1}'
   # echo '/'^$_eeh^'/ { print $1}'
-  _nef = `{9p read acme/index | awk '/'^$_eeh^'/ { print $1}'}
+ _nef = `{9p read acme/index | awk '/'^$_eeh^'/ { print $1}'}
   switch ( $#_nef )  {
   case 0
     echo "No error file? Bad directory?"
   case *
-    ninja -C out/Debug $* | 9p write acme/^$_nef^/body
+    ninja -j400 -C out/Debug $* | 9p write acme/^$_nef^/body
   }
 }
 
-# in particular, I want some scriptage to  do something useful...
+# Default build.
+fn nind {
+    nin out/Debug $*
+}
 
+# Oz build.
+fn ninoz {
+    nin out_cros_aura/Release $*
+}
 
 fn install {
     ssh pixel stop ui
