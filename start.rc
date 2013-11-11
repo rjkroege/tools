@@ -131,11 +131,14 @@ fn ninoz {
 }
 
 fn install {
+  _target = $1
     ssh pixel stop ui
     # Copy chrome over.
-    rsync -rtlv --inplace 'out/Release/'^(chrome content_shell chrome.pak libffmpegsumo.so locales resources resources.pak) pixel:/opt/google/chrome/.
-    rsync -rtlv --inplace out/Release/lib/ pixel:/opt/google/chrome/.
+    rsync -rtlv --inplace $_target^'/Release/'^(chrome content_shell chrome.pak libffmpegsumo.so locales resources resources.pak) pixel:/opt/google/chrome/.
+    rsync -rtlv --inplace $_target^'/Release/lib' pixel:/opt/google/chrome/.
     # ssh pixel start ui
 }
 
-# {rsync -rtlv --inplace 'out/Release/'^(chrome content_shell chrome.pak libffmpegsumo.so locales resources resources.pak) pixel:/opt/google/chrome/.}
+fn installoz {
+   install  out_cros_aura
+}
