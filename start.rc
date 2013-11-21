@@ -80,10 +80,8 @@ fn skpu {
 # TODO(rjkroege): These need to be updated.
 # I might want to make this configurable
 fn goma-enable {
-  # TODO(rjkroege) insert calls here to initialize.
-  path = ($_s/third_party/llvm-build/Release+Asserts/bin $path)
-  CC = clang
-  CXX = clang++
+  $_o/goma/goma_ctl.sh
+  path = ($_o/goma $path)
 }
 
 fn goma-disable {
@@ -91,7 +89,7 @@ fn goma-disable {
   _np = ()
   for (i in $path) {
     switch ($i) {
-    case $_s/third_party/llvm-build/Release+Asserts/bin
+    case $_o/goma
     case *
       _np = ($_np $i)
     }
@@ -108,9 +106,9 @@ fn nin {
   shift   
   _p = `{pwd}^'/'^$_target
   _eeh = `{echo $_p | sed 's/\//\\\//g'}^'\/Errors'
-  # echo $_eeh
-  # 9p read acme/index | awk  '{print $1}'
-  # echo '/'^$_eeh^'/ { print $1}'
+   # echo $_eeh
+   # 9p read acme/index | awk  '{print $1}'
+   # echo '/'^$_eeh^'/ { print $1}'
  _nef = `{9p read acme/index | awk '/'^$_eeh^'/ { print $1}'}
   switch ( $#_nef )  {
   case 0
