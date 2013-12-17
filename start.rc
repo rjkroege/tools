@@ -5,13 +5,12 @@ _d = $_o/depot_tools
 _w = $_s/third_party/WebKit
 
 GYP_GENERATORS = ninja
-gomadir = /home/build/static/projects/goma
 
 switch ( `{uname} ) {
 case Darwin
-  GYP_DEFINES = 'component=shared_library fastbuild=1'
+  GYP_DEFINES = 'component=shared_library use_goma=1 clang=1'
 case *
-  GYP_DEFINES = 'component=shared_library fastbuild=1 chromeos=1'
+  GYP_DEFINES = 'component=shared_library use_goma=1 clang=1 chromeos=1'
 }
 
 path = ($_w/Tools/Scripts $_s/tools $_d $path )
@@ -49,39 +48,11 @@ cdpath = (\
 
 _extra_status = '(chrome) '
 
-# truncates the given path argument to something nicer
-# arrange from longest to shortest
-fn skpupath {
-  ifs=() _pwd = `{pwd}
-  
-  for ( i in $depotlist ) {
-    # echo debugging $i
-    if( ~ $_pwd  $i^* ) {
-         echo $i | sed 's:'^$_o^'::'
-         return 0
-    }
-  }
-  return 1
-}
-
-# Does this need refinement?
-# Possibly.
-# This is also obsolete.
-fn skpu {
-  b = `{git branch | awk '/^\*/ {print $2 }'}
-  _spork_path = '/usr/local/google/rjkroege'^`{skpupath}
-  echo  path $_spork_path
-  git commit -a -m wip
-  git push linux
-  ssh spork 'cd '^$_spork_path^'; git reset --hard'
-}
-
 # Running Goma
 # TODO(rjkroege): These need to be updated.
 # I might want to make this configurable
 fn goma-enable {
-  $_o/goma/goma_ctl.sh
-  path = ($_o/goma $path)
+  $home/goma/goma_ctl.sh ensure_start
 }
 
 fn goma-disable {
