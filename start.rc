@@ -52,6 +52,7 @@ _extra_status = '(chrome) '
 # TODO(rjkroege): These need to be updated.
 # I might want to make this configurable
 fn goma-enable {
+  # I don't have a consistent home for goma.	
   $home/goma/goma_ctl.sh ensure_start
 }
 
@@ -71,11 +72,12 @@ fn goma-disable {
 }
 
 # Path to out directory then targets. 
-# TODO(rjkroege): Make sure goma is running.
+# TODO(rjkroege): Test if goma is available, start if possible, use if started.
+# To use alternative directories, re-jig $_s
 fn nin {
   _target = $1
   shift   
-  _p = `{pwd}^'/'^$_target
+  _p = $_s^'/'^$_target
   _eeh = `{echo $_p | sed 's/\//\\\//g'}^'\/Errors'
    # echo $_eeh
    # 9p read acme/index | awk  '{print $1}'
@@ -85,7 +87,7 @@ fn nin {
   case 0
     echo "No error file? Bad directory?"
   case *
-    ninja -j400 -C $_target $* | 9p write acme/^$_nef^/body
+    ninja -j4 -C $_s^'/'^$_target $* | 9p write acme/^$_nef^/body
   }
 }
 
