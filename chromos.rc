@@ -1,8 +1,8 @@
 # assorted setup for doing chromos work
 . $home/g/tools/start.rc
 
-_cs = /home/rjkroege/cros/chromeos/src/scripts
-_cr = /home/rjkroege/cros/chromeos
+_cs = $_o/os/
+_css = $_cs/src/scripts
 
 CHROME_ORIGIN=LOCAL_SOURCE
 
